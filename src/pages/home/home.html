@@ -1,0 +1,75 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Home</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-grid>
+    <ion-row>
+      <ion-col col-12>
+        <p>Record your 15 second chirp.</p>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col col-2 >
+        <ion-item>
+          <d3-micTimer id="micTimer-gauge1" timerAction={{micTimerAction}} userConfig={{micTimerConfig}} (finished)="onFinished($event)" item-right></d3-micTimer>
+        </ion-item>
+      </ion-col>
+
+      <ion-col col-1>
+          <button ion-button color=secondary [disabled]="startMicTimerBtnDisabled" (click)="onStartMicTimer()">
+            <ion-icon name="mic"></ion-icon>
+          </button>
+          <br>
+          <button ion-button color=secondary [disabled]="pauseMicTimerBtnDisabled" (click)="onPauseMicTimer()">
+            <ion-icon name="pause"></ion-icon>
+          </button>
+          <br>
+          <button ion-button color=secondary [disabled]="stopMicTimerBtnDisabled" (click)="onStopMicTimer()">
+            <ion-icon name="square"></ion-icon>
+          </button>
+      </ion-col>
+
+      <ion-col col-3>
+        <ion-row>
+          <button ion-button color=secondary [disabled]="warmupUpBtnDisabled" (click)="onWarmupUp()" item-left>
+            <ion-icon name="arrow-up"></ion-icon>
+          </button>
+          <ion-label>{{warmup_for}}</ion-label>
+          <button ion-button color=secondary [disabled]="warmupDownBtnDisabled" (click)="onWarmupDown()" item-right>
+            <ion-icon name="arrow-down"></ion-icon>
+          </button>
+        </ion-row>
+
+        <ion-row>
+          <button ion-button color=secondary [disabled]="countdownUpBtnDisabled" (click)="onCountdownUp()">
+            <ion-icon name="arrow-up"></ion-icon>
+          </button>
+          <ion-label >{{countdown_for}}</ion-label>
+          <button ion-button color=secondary [disabled]="countdownDownBtnDisabled" (click)="onCountdownDown()">
+            <ion-icon name="arrow-down"></ion-icon>
+          </button>
+        </ion-row>
+
+        <ion-row>
+          <br>
+          <button ion-button color=secondary [disabled]="warningUpBtnDisabled" (click)="onWarningUp()">
+            <ion-icon name="arrow-up"></ion-icon>
+          </button>
+          <ion-label text-middle>{{warning_for}}</ion-label>
+          <button ion-button color=secondary [disabled]="WarningDownBtnDisabled" (click)="onWarningDown()">
+            <ion-icon name="arrow-down"></ion-icon>
+          </button>
+        </ion-row>
+        
+      </ion-col>
+
+
+    </ion-row>
+  </ion-grid>
+
+
+</ion-content>
+
