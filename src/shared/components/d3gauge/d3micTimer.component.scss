@@ -1,25 +1,3 @@
-/*
- * variables
- */
-
-$c-body: #2c2c2d;
-$c-sidebarBright: #4a5463;
-$c-sidebarDark: #22262e;
-
-$c-borderBright: #aaa;
-$c-borderDark: #777;
-
-$c-signalGreen: #33aa6b;
-$c-signalBlue: #18a8f1;
-$c-signalOrange: #ec6941;
-$c-signalRed: #e60012;
-
-$c-redBright: #ff5440;
-$c-redDark: #f1301a;
-$c-purpleBright: #a8aff1;
-$c-purpleDark: #777ec3;
-$c-cyanBright: #62d6eb;
-$c-cyanDark: #00a8c9;
 
 .micTimer-gauge {
   margin:0px;
@@ -28,7 +6,3 @@ $c-cyanDark: #00a8c9;
   border-color: #0000ff;
 }
 
-.redBackgroundStop1 { stop-color: adjust-lightness( $c-redBright, 7 ); }
-.redBackgroundStop2 { stop-color: $c-redBright; }
-.redForegroundStop1 { stop-color: adjust-lightness( $c-redBright, 35 ); }
-.redForegroundStop2 { stop-color: adjust-lightness( $c-redBright, 23 ); }

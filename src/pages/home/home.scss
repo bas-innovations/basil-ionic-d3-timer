@@ -4,7 +4,13 @@ page-home {
         padding: 0;
     }
 
-    ion-row {
+    .page-header-text {
+        text-align: center;
+        color: cornflowerblue;
+    }
+
+    
+    ion-row { // border styles just here for layout inspects in testing
         flex: 1;
         border-width: 0px;
         border-style: solid;
@@ -12,15 +18,15 @@ page-home {
         border-top-color: mediumseagreen;
 
     }
-
-    ion-col {
+    
+    ion-col { // border styles just here for layout inspects in testing
         flex: 1;
         border-width: 0px;
         border-style: solid;
         border-left-color: blueviolet;
         border-right-color: blueviolet;
-
     }
+
     .control-cols{
         min-width: 13em;
     }
@@ -34,8 +40,19 @@ page-home {
         }
         max-height: 28px;
     }
-    
+    .disappearing-col {
+        min-width: 0;
+    }
+
+    .svg-column {
+        text-align: center;
+    }
    
+    .button-grid-col {
+        max-width: 4.0em;
+        min-width: 2.5em;
+    }
+
     .control-grid-col {
         max-width: 4.0em;
         min-width: 2.5em;
@@ -87,6 +104,12 @@ page-home {
         max-width: 3.6em;
         position: absolute;
         padding: 0;
+        background-color: transparent;
+        color: cornflowerblue;
+        border-width: 2px;
+        border-style: solid;  
+        border-radius: 5px;
+        opacity: 0.8;              
     }
     .sib-right {
         position: absolute;
@@ -101,18 +124,15 @@ page-home {
     
     .small-icon-button-warm-up {
         @extend .small-icon-button;
-        background-color: orange;
-        opacity: 0.8;
+        border-color: orange;
     }
     .small-icon-button-countdown {
         @extend .small-icon-button;
-        background-color: seagreen;
-        opacity: 0.8; 
+        border-color: seagreen;
     }
     .small-icon-button-warning {
         @extend .small-icon-button;
-        background-color: red;
-        opacity: 0.8;
+        border-color: red;
     }
 
 }

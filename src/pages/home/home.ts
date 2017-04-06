@@ -17,9 +17,9 @@ export class HomePage {
   startMicTimerBtnDisabled: boolean = false;
   pauseMicTimerBtnDisabled: boolean = true;
   stopMicTimerBtnDisabled: boolean = true;
-  warmUpFor: number = 4000;
-  countdownFor: number = 7000;
-  warningFor: number = 2000;
+  warmUpFor: number = 5000;
+  countdownFor: number = 20000;
+  warningFor: number = 1000;
   warmupUpBtnDisabled: boolean = false;
   countdownUpBtnDisabled: boolean = false;
   warningUpBtnDisabled: boolean = false;

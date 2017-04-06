@@ -1,6 +1,6 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>Home</ion-title>
+    <ion-title>Timer</ion-title>
   </ion-navbar>
 </ion-header>
 
@@ -8,42 +8,38 @@
   <ion-grid>
     <ion-row>
       <ion-col>
-        <p>Record your 15 second chirp.</p>
+        <h3 class="page-header-text" >Ring Countdown Timer Component Demo</h3>
       </ion-col>
     </ion-row>
     <ion-row>
-      <ion-col>
-      </ion-col>
-      <ion-col col-3>
-        <d3-micTimer center id="micTimer-gauge1" timerAction={{micTimerAction}} 
+      <ion-col col-12 class="svg-column" >
+        <d3-micTimer id="micTimer-gauge1" timerAction={{micTimerAction}} 
                     warmUpFor={{warmUpFor}}
                     countdownFor={{countdownFor}} 
                     warningFor={{warningFor}} 
                     (finished)="onFinished($event)"></d3-micTimer>
       </ion-col>
-      <ion-col>
-      </ion-col>
     </ion-row>
 
     <ion-row>
-      <ion-col>
+      <ion-col class="disappearing-col">
       </ion-col>
-      <ion-col col-33 control-grid-col>
-          <button ion-button block color=secondary [disabled]="startMicTimerBtnDisabled" (click)="onStartMicTimer()">
-            <ion-icon name="mic"></ion-icon>
+      <ion-col col-33 control-grid-col class="button-grid-col">
+          <button ion-button block color=primary [disabled]="startMicTimerBtnDisabled" (click)="onStartMicTimer()">
+            <ion-icon name="play"></ion-icon>
           </button>
       </ion-col>
-      <ion-col col-34 control-grid-col>
-          <button ion-button block color=secondary [disabled]="pauseMicTimerBtnDisabled" (click)="onPauseMicTimer()">
+      <ion-col col-33 control-grid-col class="button-grid-col">
+          <button ion-button block color=primary [disabled]="pauseMicTimerBtnDisabled" (click)="onPauseMicTimer()">
             <ion-icon name="pause"></ion-icon>
           </button>
       </ion-col>
-      <ion-col col-34 control-grid-col>
-          <button ion-button block color=secondary [disabled]="stopMicTimerBtnDisabled" (click)="onStopMicTimer()">
+      <ion-col col-33 control-grid-col class="button-grid-col">
+          <button ion-button block color=primary [disabled]="stopMicTimerBtnDisabled" (click)="onStopMicTimer()">
             <ion-icon name="square"></ion-icon>
           </button>
       </ion-col>
-      <ion-col>
+      <ion-col class="disappearing-col">
       </ion-col>      
     </ion-row>
 
@@ -52,11 +48,11 @@
       </ion-col>
       <ion-col class="control-cols">
         <ion-row col-100 class="special">
-          <p class="control-label-text">Warm up</p>
+          <p class="control-label-text">Warm Up Time (ms)</p>
         </ion-row>
         <ion-row class='control-rows-sub'>      
           <ion-col col-33 control-grid-col class="control-cols-sub">
-            <button ion-button block round class="small-icon-button-warm-up sib-right" [disabled]="warmupDownBtnDisabled" (click)="onWarmupDown()" item-right>
+            <button ion-button block class="small-icon-button-warm-up sib-right" [disabled]="warmupDownBtnDisabled" (click)="onWarmupDown()" item-right>
               <ion-icon name="arrow-down" class="small-icon"></ion-icon>
             </button>
           </ion-col>
@@ -64,7 +60,7 @@
             <ion-label class='control-text-input' text-center>{{warmUpFor}}</ion-label>
           </ion-col>
           <ion-col col-33 control-grid-col class="control-cols-sub">
-            <button ion-button block round class="small-icon-button-warm-up sib-left" [disabled]="warmupUpBtnDisabled" (click)="onWarmupUp()" item-left>
+            <button ion-button block class="small-icon-button-warm-up sib-left" [disabled]="warmupUpBtnDisabled" (click)="onWarmupUp()" item-left>
               <ion-icon name="arrow-up" class="small-icon"></ion-icon>
             </button>
           </ion-col>
@@ -79,7 +75,7 @@
       </ion-col>
       <ion-col class="control-cols">
         <ion-row col-100 class="special">
-          <p class="control-label-text">Countdown</p>
+          <p class="control-label-text">Countdown Time (ms)</p>
         </ion-row>
         <ion-row class='control-rows-sub'>
           <ion-col col-33 control-grid-col>
@@ -106,7 +102,7 @@
       </ion-col>
       <ion-col class="control-cols">
         <ion-row col-100 class="special">
-          <p class="control-label-text">Warning</p>
+          <p class="control-label-text">Warning Time (ms)</p>
         </ion-row>
         <ion-row class='control-rows-sub'>        
           <ion-col col-33 control-grid-col>
@@ -129,7 +125,13 @@
     </ion-row>
 
   </ion-grid>
-
+        
+  <p>The warm-up time gives the signal that the countdown is about to start.</p>
+  <p>The warning time changes the dial colour to red near the end of the countdown period.</p>
+  <p>Increasing the countdown beyond 60,000ms, will introduce an additional outer ring for the minutes.</p>
+  <p>After the minutes ring, hour and day rings will be added as required, though with this interface that would require
+    a large amount of clicking.
+  </p>
 
 </ion-content>
 

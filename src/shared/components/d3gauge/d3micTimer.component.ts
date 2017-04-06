@@ -49,33 +49,32 @@ export class D3MicTimerComponent implements OnChanges {
       rSize: 30, // px overall size of internal micTimer ex the arc thickness
       rThickness: 10, // px thickness of micTimer
       msShrinkFactor: 0.75, // microsecond circle thickness. 0 is full size, 1 is zero thickness
-      scaleFactor: 0.75,  // multiplier to scale the entire gauge.
+      scaleFactor: 1.00,  // multiplier to scale the entire gauge.
       updateInterval: 20, // ms time between updates to text and micTimer arcs.
       firstCircleColor: 'rgba' + d3.rgb("lightslategrey").toString().slice(3, - 1) +  ', 0.2)', // lightslategrey
       readyCircleColor: 'rgba' + d3.rgb("gold").toString().slice(3, - 1) +  ', 0.7)', //gold
       countdownCircleColor: 'rgba' + d3.rgb("seagreen").toString().slice(3, - 1) +  ', 0.7)', // seagreen
       warmupCircleColor: "orange", // orange
       warmupFlashTime: 1000, // time to change alpha of warmup band.
-      warningCircleColor: 'rgba' + d3.rgb("red").toString().slice(3, - 1) +  ', 0.8)', // red
+      warningCircleColor: 'rgba' + d3.rgb("red").toString().slice(3, - 1) +  ', 0.7)', // red
       finishedCircleColor: 'rgba' + d3.rgb("outer space").toString().slice(3, - 1) +  ', 0.8)', // outer space
       textColor: "black",
       counterTextSize: 1.5, // The relative height of the text to display in the circle. 1 = 50%
       unitTextSize: 0.6, // The relative height of the text to display in the circle. 1 = 50%
-      countdownTo: "31/03/2017",
       countdownFor: 15000,  // countdown time in ms
       warmUpFor: 3000,  // countdown time in ms
       warningFor: 1000,  // countdown time in ms
       elementId: 'micTimer-gauge',
-      calc: {
+      calc: { // these variables are placed here as the config structure is a convenient place to store, pass them. But not actually configuration variables.
           radius: 0,
           counterTextPixels: 0,
           unitTextPixels: 0,
-          phase: 'ready',
-          previousPhase: 'ready',
-          pauseAlpha: 1.0,
-          warmUpAlpha: 1.0,
+          phase: 'ready', // 'warmup', 'countdown', 'warning', 'finished', 'paused', 'stopped'
+          previousPhase: 'ready', // 'warmup', 'countdown', 'warning', 'finished', 'paused', 'stopped'
+          pauseAlpha: 1.0, // variable to enable pulsing effect during a pause phase.
+          warmUpAlpha: 1.0, // variable to enable pulsing effect during the warm up phase.
           warmUpMessage: 'ready...'
-      } // 'warmup', 'countdown', 'warning', 'finished', 'paused', 'stopped'.
+      } 
     };
     this.config = config;
   }
@@ -106,8 +105,7 @@ export class D3MicTimerComponent implements OnChanges {
       }
     }
     this.changeLog.push(log.join(', '));
-
-    console.log(JSON.stringify(this.changeLog));
+    // console.log(JSON.stringify(this.changeLog));
   }
 
   handlePropName(propName, propValue, isFirstChange: boolean){
@@ -184,7 +182,6 @@ export class D3MicTimerComponent implements OnChanges {
     let numRings = this.getInitialRingNums();
     this.setNumRings(numRings);
     this.initDimensions();
-    console.log('about to set phase to ready');
     this.setPhaseByValue('ready');
   }
 
@@ -251,6 +248,10 @@ export class D3MicTimerComponent implements OnChanges {
     console.log('setCountdownToFromTime=>this.countdownToTime: ' + this.countdownToTime);
   }
 
+  // **
+  // ** update is called by the main timer interval, it simply calls the methods required to
+  // ** update the time information and redraw the timer components d3 objects.
+  // **
   update(): any {
     this.updateTimeData();
     this.drawD3Timer();
@@ -280,7 +281,7 @@ export class D3MicTimerComponent implements OnChanges {
         if (this.config.calc.phase === 'warmup') { 
           // initially the countdown time was displayed during warmup - it has now been replaced by text.
           time = Math.min(time, this.config.countdownFor);
-          // over the period of a second we want the alpha component of the warmUp ring to rise to 1 and fall to zero.
+          // over the period of a second, during the warm up phase, we want the alpha component of the countdown rings and text to rise from 0 to 1.
           this.warmupRemaining = Math.max(0, this.countdownRemaining - this.config.countdownFor);
           this.config.calc.warmUpAlpha = ((this.warmupRemaining)/this.config.warmupFlashTime) % 1;
           // the warmUp text - giving user plenty of notice timer will start shortly.
@@ -295,6 +296,7 @@ export class D3MicTimerComponent implements OnChanges {
         this.countdownRemaining = 0;
         break;
       case 'paused':
+        // over the period of a second, during a pause phase, we want the alpha component of the countdown rings and text to rise from 0 to 1.
         this.config.calc.pauseAlpha = (new Date().getTime()/this.config.warmupFlashTime) % 1;
         this.config.calc.pauseAlpha = (this.config.calc.pauseAlpha > 0.5) ? 1 - this.config.calc.pauseAlpha : this.config.calc.pauseAlpha;
         return;
@@ -303,6 +305,7 @@ export class D3MicTimerComponent implements OnChanges {
         this.countdownRemaining = 0;
         break;
       default :
+        // typically would throw error here rather than console.log
         console.log('error we have an unrecognised timer status')
     }
 
@@ -353,6 +356,7 @@ export class D3MicTimerComponent implements OnChanges {
         // less than an interval to go - let's finish up.
         this.setPhaseByValue('finished');
       } else {
+        // typically would throw error here rather than console.log
         console.log('Error in d3micTimer.component.ts=>setPhase')
       }
     }
@@ -381,6 +385,7 @@ export class D3MicTimerComponent implements OnChanges {
   }
 
   setNumRings(numRings) {
+    // remove unneeded rows from the timeData array.
     this.config.rCount = numRings;
     let arrSize = this.timeData.length;
     for (let i=arrSize-1; i>=numRings; i--) {
@@ -390,7 +395,7 @@ export class D3MicTimerComponent implements OnChanges {
 
   initDimensions(){
     this.micTimerAttr = {
-      w: (this.config.rSize  + (this.config.rThickness * this.config.rCount) + ((this.config.rCount - 1) * this.config.ringSpacing)) * 2 + 6, // the +4 accounts for svg border.
+      w: (this.config.rSize  + (this.config.rThickness * this.config.rCount) + ((this.config.rCount - 1) * this.config.ringSpacing)) * 2 + 6, // the +6 adds some margins.
       h: (this.config.rSize + (this.config.rThickness * this.config.rCount) + ((this.config.rCount - 1) * this.config.ringSpacing)) * 2 + 6,
       margin: {top: 2, bottom: 2, right: 2, left: 2}
     };
@@ -417,8 +422,8 @@ export class D3MicTimerComponent implements OnChanges {
     this.micTimerGroup = this.micTimer.append("g")
         .attr("transform", "translate(" + this.micTimerAttr.margin.left + "," + this.micTimerAttr.margin.top + ")");
 
-    // filter stuff
-    /* For the drop shadow filter... */
+    // ** filter stuff
+    // ** For the drop shadow filter...
     let defs = this.micTimerGroup.append( 'defs' );
 
     let filter = defs.append( 'filter' )
@@ -441,38 +446,6 @@ export class D3MicTimerComponent implements OnChanges {
     feMerge.append( 'feMergeNode' )
             .attr( 'in', 'SourceGraphic' );
     // end filter stuff
-
-    // gradient stuff
-    let gradientBackgroundRed = defs.append( 'linearGradient' )
-                                    .attr( 'id', 'gradientBackgroundRed' )
-                                    .attr( 'x1', '0' )
-                                    .attr( 'x2', '0' )
-                                    .attr( 'y1', '0' )
-                                    .attr( 'y2', '1' );
-    gradientBackgroundRed.append( 'stop' )
-                        .attr( 'class', 'redBackgroundStop1' )
-                        .attr( 'offset', '0%' );
-
-    gradientBackgroundRed.append( 'stop' )
-                        .attr( 'class', 'redBackgroundStop2' )
-                        .attr( 'offset', '100%' );
-
-    let gradientForegroundRed = defs.append( 'linearGradient' )
-                                    .attr( 'id', 'gradientForegroundRed' )
-                                    .attr( 'x1', '0' )
-                                    .attr( 'x2', '0' )
-                                    .attr( 'y1', '0' )
-                                    .attr( 'y2', '1' );
-    gradientForegroundRed.append( 'stop' )
-                        .attr( 'class', 'redForegroundStop1' )
-                        .attr( 'offset', '0%' );
-
-    gradientForegroundRed.append( 'stop' )
-                        .attr( 'class', 'redForegroundStop2' )
-                        .attr( 'offset', '100%' );
-
-    // end gradient stuff
-
   }
 
   // ** Draw and redraw D3 objects
