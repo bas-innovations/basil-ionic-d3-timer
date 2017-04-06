@@ -13,13 +13,13 @@ export class HomePage {
   // variables for micTimer component
   micTimerAction: string;
   micStatus: string;
-  micTimerConfig: IMicTimerConfig;
+  //micTimerConfig: IMicTimerConfig;
   startMicTimerBtnDisabled: boolean = false;
   pauseMicTimerBtnDisabled: boolean = true;
   stopMicTimerBtnDisabled: boolean = true;
-  warmup_for: number = 3000;
-  countdown_for: number = 15000;
-  warning_for: number = 1000;
+  warmUpFor: number = 4000;
+  countdownFor: number = 7000;
+  warningFor: number = 2000;
   warmupUpBtnDisabled: boolean = false;
   countdownUpBtnDisabled: boolean = false;
   warningUpBtnDisabled: boolean = false;
@@ -32,11 +32,11 @@ export class HomePage {
   }
   // actions on micTimer component
   onStartMicTimer(){
-    this.micTimerConfig = {
-      countdown_for: 20000,  // countdown time in ms
-      warmup_for: 2000,  // countdown time in ms
-      warning_for: 3000 // countdown time in ms}
-    };
+    //this.micTimerConfig = {
+    //  countdownFor: 20000,  // countdown time in ms
+    //  warmUpFor: 2000,  // countdown time in ms
+    //  warningFor: 3000 // countdown time in ms}
+    //};
     this.micTimerAction = "start";
     this.micStatus = 'recording';
     this.startMicTimerBtnDisabled = true;
@@ -75,28 +75,28 @@ export class HomePage {
 
   onWarmupUp(){
     console.log('onWarmupUp');
-    this.warmup_for += 1000;
-    console.log(this.warmup_for);
+    this.warmUpFor += 1000;
+    console.log(this.warmUpFor);
   }
   onWarmupDown(){
-    this.warmup_for -= 1000;
-    this.warmup_for = Math.max(this.warmup_for, 0);
+    this.warmUpFor -= 1000;
+    this.warmUpFor = Math.max(this.warmUpFor, 0);
   }
   
   onCountdownUp(){
-    this.countdown_for += 1000;
+    this.countdownFor += 1000;
   }
   onCountdownDown(){
-    this.countdown_for -= 1000;
-    this.countdown_for = Math.max(this.countdown_for, 0);
+    this.countdownFor -= 1000;
+    this.countdownFor = Math.max(this.countdownFor, 0);
   }
 
   onWarningUp(){
-    this.warning_for += 1000;
+    this.warningFor += 1000;
   }
   onWarningDown(){
-    this.warning_for -= 1000;
-    this.warning_for = Math.max(this.warning_for, 0);
+    this.warningFor -= 1000;
+    this.warningFor = Math.max(this.warningFor, 0);
   }
   // END actions on micTimer component
 }

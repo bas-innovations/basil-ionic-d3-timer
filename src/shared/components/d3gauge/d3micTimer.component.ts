@@ -12,7 +12,10 @@ import { IMicTimerConfig } from './d3micTimerConfig.interface';
 })
 export class D3MicTimerComponent implements OnChanges {
   @Input() timerAction: any;
-  @Input() userConfig: IMicTimerConfig[];
+  @Input() warmUpFor: any;
+  @Input() countdownFor: any;
+  @Input() warningFor: any;
+  
   @Output() finished = new EventEmitter<boolean>();
 
   changeLog: string[] = [];
@@ -48,14 +51,13 @@ export class D3MicTimerComponent implements OnChanges {
       msShrinkFactor: 0.75, // microsecond circle thickness. 0 is full size, 1 is zero thickness
       scaleFactor: 0.75,  // multiplier to scale the entire gauge.
       updateInterval: 20, // ms time between updates to text and micTimer arcs.
-      firstCircleColor: "rgba(149,145,140,0.2)", // gray
-      msCircleColor: "rgba(132, 255, 152, 0.3)",
-      readyCircleColor: "rgba(255, 163, 67, 0.8)", // neon carrot
-      countdownCircleColor: "rgba(28, 172, 120, 0.8)", // green
+      firstCircleColor: 'rgba' + d3.rgb("lightslategrey").toString().slice(3, - 1) +  ', 0.2)', // lightslategrey
+      readyCircleColor: 'rgba' + d3.rgb("gold").toString().slice(3, - 1) +  ', 0.7)', //gold
+      countdownCircleColor: 'rgba' + d3.rgb("seagreen").toString().slice(3, - 1) +  ', 0.7)', // seagreen
       warmupCircleColor: "orange", // orange
       warmupFlashTime: 1000, // time to change alpha of warmup band.
-      warningCircleColor: "rgba(238, 32, 77, 0.8)", // red
-      finishedCircleColor: "rgba(65, 74, 76, 0.8)", // outer space
+      warningCircleColor: 'rgba' + d3.rgb("red").toString().slice(3, - 1) +  ', 0.8)', // red
+      finishedCircleColor: 'rgba' + d3.rgb("outer space").toString().slice(3, - 1) +  ', 0.8)', // outer space
       textColor: "black",
       counterTextSize: 1.5, // The relative height of the text to display in the circle. 1 = 50%
       unitTextSize: 0.6, // The relative height of the text to display in the circle. 1 = 50%
@@ -83,10 +85,7 @@ export class D3MicTimerComponent implements OnChanges {
   }
   
   ngAfterViewInit(){
-    this.readyTimer();
-    this.initGroup();
-    this.updateTimeData();
-    this.drawTimerGroup();
+    this.initTimer();
   };
 
   // **
@@ -99,31 +98,38 @@ export class D3MicTimerComponent implements OnChanges {
       let to = JSON.stringify(changedProp.currentValue);
       if (changedProp.isFirstChange()) {
         log.push(`Initial value of ${propName} set to ${to}`);
-        if (propName === 'timerAction') {
-          this.handleTimerAction();
-        } else if (propName === 'userConfig') {
-          console.log('want to handle userConfig initial change');
-          this.handleUserConfigChange();
-        }
+        this.handlePropName(propName, changedProp.currentValue, changedProp.isFirstChange());
       } else {
         let from = JSON.stringify(changedProp.previousValue);
         log.push(`${propName} changed from ${from} to ${to}`);
-        if (propName === 'timerAction') {
-          this.handleTimerAction();
-        } else if (propName === 'userConfig') {
-          console.log('want to handle userConfig subsequent change');
-          this.handleUserConfigChange();
-          for (var key in this.userConfig) {
-            console.log('this.userConfig.countdownFor: ' + this.userConfig[key]);
-          }
-          //console.log('this.userConfig.countdownFor: ' + this.userConfig['countdownFor']);
-          //console.log('this.userConfig.warmUpFor: ' + this.userConfig.warmUpFor);
-        }
+        this.handlePropName(propName, changedProp.currentValue, changedProp.isFirstChange());
       }
     }
     this.changeLog.push(log.join(', '));
 
     console.log(JSON.stringify(this.changeLog));
+  }
+
+  handlePropName(propName, propValue, isFirstChange: boolean){
+    switch (propName) {
+      case 'timerAction':
+        this.handleTimerAction();
+        break;
+      case 'warmUpFor':
+      case 'countdownFor':
+      case 'warningFor':
+        this.config[propName] = parseInt(propValue);
+        if (!isFirstChange){
+          this.initTimer();
+        }
+        break;
+    }
+  }
+
+  loadParentConfig(){
+    this.config.warmUpFor = parseInt(this.warmUpFor);
+    this.config.countdownFor = parseInt(this.countdownFor);
+    this.config.warningFor = parseInt(this.warningFor);
   }
 
   handleTimerAction() {
@@ -155,19 +161,20 @@ export class D3MicTimerComponent implements OnChanges {
     }
   }
 
-  handleUserConfigChange() {
-    console.log('in handleUserConfigChange');
-    console.log(JSON.stringify(this.userConfig));
-    if (typeof this.userConfig !== 'undefined')
-      this.config = mergeDeep(this.config, this.userConfig || {});
-    console.log(JSON.stringify(this.config));
-  }
-
   // **
   // ** Timer functions
   // **
+
+  initTimer(){
+    this.readyTimer();
+    this.initD3Timer();
+    this.updateTimeData();
+    this.drawD3Timer();
+  }
+
   readyTimer() {
     this.loadDefaultConfig();
+    this.loadParentConfig();
 
     this.initRingerTimeData();
     this.setCountdownToFromTime();
@@ -182,27 +189,22 @@ export class D3MicTimerComponent implements OnChanges {
   }
 
   startTimer() {
-    // start the time
-    console.log('in startTimer=>this.timeData: ' + JSON.stringify(this.timeData));
-    console.log('in startTimer=>this.config: ' + JSON.stringify(this.timeData));
     // move from ready to warmup;
     this.setPhaseByValue('warmup');
     this.setCountdownToFromTime();
+    // start the timer loop
     this.runTimer();
   }
 
   runTimer() {
     let self = this;
     this.myD3Timer = d3.interval(function(elapsed) {
-      // console.log('elapsed: ' + elapsed);
       // check if time is up or if it has been stopped by the user.
       if ((self.config.calc.phase === 'finished') || (self.config.calc.phase === 'stopped')) {
-        // if (self.config.calc.phase === 'stopped') console.log('in runTimer=>this.timeData phase=stopped: ' + JSON.stringify(self.timeData));
         if (self.config.calc.phase === 'finished') console.log('timer has finished');
         if (self.config.calc.phase === 'stopped') console.log('timer has been stopped');
         self.myD3Timer.stop();
         self.update();
-        console.log('about to resetTimer from runTimer')
         self.resetTimer();
       } else {
         self.update();
@@ -234,14 +236,16 @@ export class D3MicTimerComponent implements OnChanges {
     console.log('in resetTimer')
     this.readyTimer();
     this.updateTimeData();
-    this.drawTimerGroup();
+    this.drawD3Timer();
     // send a message back to the parent
-    console.log('about to emit finished to parent');
+    console.log("about to emit 'finished' to parent");
     this.finished.emit();
   };
 
   setCountdownToFromTime(){
-    this.countdownToTime = new Date().getTime() + this.config.countdownFor + this.config.warmUpFor;
+    let currentTime = new Date().getTime()
+    this.countdownToTime = currentTime + this.config.countdownFor + this.config.warmUpFor;
+    console.log('setCountdownToFromTime=>currentTime: ' + currentTime);
     console.log('setCountdownToFromTime=>this.config.countdownFor: ' + this.config.countdownFor);
     console.log('setCountdownToFromTime=>this.config.warmUpFor: ' + this.config.warmUpFor);
     console.log('setCountdownToFromTime=>this.countdownToTime: ' + this.countdownToTime);
@@ -249,8 +253,7 @@ export class D3MicTimerComponent implements OnChanges {
 
   update(): any {
     this.updateTimeData();
-    //if (this.config.calc.phase === 'stopped') console.log('in update()=>this.timeData: ' + JSON.stringify(this.timeData));
-    this.drawTimerGroup();
+    this.drawD3Timer();
   }
 
   updateTimeData(){
@@ -266,14 +269,11 @@ export class D3MicTimerComponent implements OnChanges {
         //console.log('ready: time: ' + time);
         break;
       case 'warmup':
-        //console.log('case warmup');
         // the timer doesn't start until we enter the countdown phase.
         // during warmup, the colors and number displayed stay at the position expected
         // at the beginning of the countdown.
       case 'countdown':
-        //console.log('case countdown');
       case 'warning':
-        //console.log('case warning');
         time = Math.max(0, this.countdownToTime - (new Date().getTime()));
         this.countdownRemaining = time;
         this.setPhase(this.countdownRemaining);
@@ -283,10 +283,8 @@ export class D3MicTimerComponent implements OnChanges {
           // over the period of a second we want the alpha component of the warmUp ring to rise to 1 and fall to zero.
           this.warmupRemaining = Math.max(0, this.countdownRemaining - this.config.countdownFor);
           this.config.calc.warmUpAlpha = ((this.warmupRemaining)/this.config.warmupFlashTime) % 1;
-          this.config.calc.warmUpAlpha = (this.config.calc.warmUpAlpha > 0.5) ? 1 - this.config.calc.warmUpAlpha : this.config.calc.warmUpAlpha;
-          this.config.calc.warmUpAlpha = this.config.calc.warmUpAlpha * 2;
           // the warmUp text - giving user plenty of notice timer will start shortly.
-          if (this.warmupRemaining >= 2000) this.config.calc.warmupMessage = ".....";
+          if (this.warmupRemaining >= 2000) this.config.calc.warmupMessage = '..-' + Math.ceil((this.warmupRemaining/1000)) + '..';
           if (this.warmupRemaining < 2000) this.config.calc.warmupMessage = "ready..";
           if (this.warmupRemaining < 1000) this.config.calc.warmupMessage = "set..";
           if (this.warmupRemaining < 100) this.config.calc.warmupMessage = "go..";
@@ -371,7 +369,10 @@ export class D3MicTimerComponent implements OnChanges {
   }
 
   getInitialRingNums(): number{
-    let time: number = Math.abs(this.countdownToTime - (new Date().getTime()));
+    let time: number = Math.abs(this.countdownToTime - (new Date().getTime()) - +this.config.warmUpFor);
+    console.log('in getInitialRingNums=>this.countdownToTime: ' + this.countdownToTime);
+    console.log('in getInitialRingNums=>time: ' + time);
+    console.log('in getInitialRingNums=>getTime: ' + new Date().getTime());
     for (let i=this.timeData.length-1; i>=0; i--) {
       let td = this.timeData[i];
       if (time > td.s) return (i + 1);
@@ -407,11 +408,12 @@ export class D3MicTimerComponent implements OnChanges {
   // **
 
   // ** Initialise D3 objects
-  initGroup() {
+  initD3Timer() {
     this.micTimer = d3.select("#" + this.config.elementId)
         .style("width", this.micTimerAttr.w + this.micTimerAttr.margin.left + this.micTimerAttr.margin.right)   // adjust the svg size to fit all the individual counters
         .style("height", this.micTimerAttr.h + this.micTimerAttr.margin.top + this.micTimerAttr.margin.bottom); // adjust the svg size to fit all the individual counters
 
+    this.micTimer.selectAll("*").remove();
     this.micTimerGroup = this.micTimer.append("g")
         .attr("transform", "translate(" + this.micTimerAttr.margin.left + "," + this.micTimerAttr.margin.top + ")");
 
@@ -474,7 +476,7 @@ export class D3MicTimerComponent implements OnChanges {
   }
 
   // ** Draw and redraw D3 objects
-  drawTimerGroup() {
+  drawD3Timer() {
 
     let config = this.config;
     let radius = config.calc.radius;
@@ -485,7 +487,7 @@ export class D3MicTimerComponent implements OnChanges {
 
     // set range min to 0.3 as don't want text, arc to be fully transparent.
     // domain oscillates between 0 and 1.0
-    let warmupScale = d3.scalePow().range([0.3, 1]).domain([0, 1]);
+    let warmupScale = d3.scalePow().exponent(0.8).range([0.3, 1]).domain([0, 1]);
 
     // **
     // ** Draw the base circles (first circles).

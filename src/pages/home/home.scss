@@ -1,3 +1,119 @@
 page-home {
 
+    ion-grid {
+        padding: 0;
+    }
+
+    ion-row {
+        flex: 1;
+        border-width: 0px;
+        border-style: solid;
+        border-bottom-color: mediumseagreen;
+        border-top-color: mediumseagreen;
+
+    }
+
+    ion-col {
+        flex: 1;
+        border-width: 0px;
+        border-style: solid;
+        border-left-color: blueviolet;
+        border-right-color: blueviolet;
+
+    }
+    .control-cols{
+        min-width: 13em;
+    }
+    .control-cols-sub{
+        min-width: 4em;
+    }
+    .control-rows-sub{
+        padding: 0;
+        .label {
+            margin: 0;
+        }
+        max-height: 28px;
+    }
+    
+   
+    .control-grid-col {
+        max-width: 4.0em;
+        min-width: 2.5em;
+        border: solid;
+        border-top-width: 2px;
+        border-top-color: red;
+    }
+
+    .special{
+        p {
+            color: darkblue;
+        }
+        padding: 0;
+        height: 18px;
+        background-color: lightblue;
+        border-top: 0px solid;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        border-bottom: 1px solid;
+        border-bottom-color: darkblue;
+    }
+
+    .control-label-text {
+        font-size: 8pt;
+        margin-top: 2px;
+        margin-left: 8px;
+        margin-bottom: 2px;
+    }
+    .control-text-input{
+        min-height: 18px;
+        position: relative;
+        top: 4px;
+        border-width: 0px;
+        border-style: solid;
+    }
+
+    div.item-inner {
+        padding-right: 0px !important;
+    }
+
+    .small-icon {
+        font-size: 14px;
+    }
+
+    .small-icon-button {
+        height: 2.5rem;
+        vertical-align: middle;
+        min-width: 1em;
+        max-width: 3.6em;
+        position: absolute;
+        padding: 0;
+    }
+    .sib-right {
+        position: absolute;
+        right: 0.25em;
+        top: 0;
+    }
+    .sib-left {
+        position: absolute;
+        left: 0.25em;
+        top: 0;
+    }
+    
+    .small-icon-button-warm-up {
+        @extend .small-icon-button;
+        background-color: orange;
+        opacity: 0.8;
+    }
+    .small-icon-button-countdown {
+        @extend .small-icon-button;
+        background-color: seagreen;
+        opacity: 0.8; 
+    }
+    .small-icon-button-warning {
+        @extend .small-icon-button;
+        background-color: red;
+        opacity: 0.8;
+    }
+
 }
+
