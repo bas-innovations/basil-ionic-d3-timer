@@ -3,7 +3,7 @@ A demonstration of using a custom component in ionic.
 
 ![alt text](https://github.com/bas-innovations/basil-ionic-d3-timer/raw/master/src/assets/markdown-here/d3-timer-screenshot-countdown.png "Timer screenshot in countdown phase")
 
-This demostration has a number of features
+This demonstration has a number of features
 
 * Ionic 2 tabs application
 * countdown timer rendered using d3.js
