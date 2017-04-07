@@ -7,10 +7,11 @@ This demonstration has a number of features
 
 * Ionic 2 tabs application
 * countdown timer rendered using d3.js
+* use of a component in an ionic application
+* communication between the component and page class using @input and @output, handling messages with ngOnChanges
 * written in Typescript
 * uses SCSS for some basic styling of the ion-grid and buttons
-* use of a component in ionic application
-* communication between the component and page class using @input and @output, handling messages with ngOnChanges
+
 
 D3.js features
 * use of d3-timer's timer and interval functions
