@@ -13,13 +13,16 @@ export class HomePage {
   // variables for micTimer component
   micTimerAction: string;
   micStatus: string;
-  //micTimerConfig: IMicTimerConfig;
-  startMicTimerBtnDisabled: boolean = false;
-  pauseMicTimerBtnDisabled: boolean = true;
-  stopMicTimerBtnDisabled: boolean = true;
+
   warmUpFor: number = 5000;
   countdownFor: number = 20000;
   warningFor: number = 1000;
+
+  startMicTimerBtnDisabled: boolean = false;
+  pauseMicTimerBtnDisabled: boolean = true;
+  stopMicTimerBtnDisabled: boolean = true;
+
+  // Variables of Disabling Buttons
   warmupUpBtnDisabled: boolean = false;
   countdownUpBtnDisabled: boolean = false;
   warningUpBtnDisabled: boolean = false;
@@ -27,21 +30,27 @@ export class HomePage {
   countdownDownBtnDisabled: boolean = false;
   warningDownBtnDisabled: boolean = false;
 
-  constructor(public navCtrl: NavController) {
+  constructor(public navCtrl: NavController) {}
 
+  disableControlBtns(disabled: boolean){
+    this.warmupUpBtnDisabled = disabled;
+    this.countdownUpBtnDisabled = disabled;
+    this.warningUpBtnDisabled = disabled;
+
+    this.warmupDownBtnDisabled = disabled;
+    this.countdownDownBtnDisabled = disabled;
+    this.warningDownBtnDisabled = disabled;
   }
-  // actions on micTimer component
+  // **
+  // ** actions on micTimer component
+  // **
   onStartMicTimer(){
-    //this.micTimerConfig = {
-    //  countdownFor: 20000,  // countdown time in ms
-    //  warmUpFor: 2000,  // countdown time in ms
-    //  warningFor: 3000 // countdown time in ms}
-    //};
     this.micTimerAction = "start";
     this.micStatus = 'recording';
     this.startMicTimerBtnDisabled = true;
     this.pauseMicTimerBtnDisabled = false;
     this.stopMicTimerBtnDisabled = false;
+    this.disableControlBtns(true);
   }
 
   onPauseMicTimer(){
@@ -61,6 +70,7 @@ export class HomePage {
     this.startMicTimerBtnDisabled = false;
     this.pauseMicTimerBtnDisabled = true;
     this.stopMicTimerBtnDisabled = true;
+    this.disableControlBtns(false);
   }
 
   onFinished() {
@@ -70,6 +80,7 @@ export class HomePage {
     this.startMicTimerBtnDisabled = false;
     this.pauseMicTimerBtnDisabled = true;
     this.stopMicTimerBtnDisabled = true;
+    this.disableControlBtns(false);
     console.log('in home.ts=>onFinished');
   }
 
@@ -88,7 +99,8 @@ export class HomePage {
   }
   onCountdownDown(){
     this.countdownFor -= 1000;
-    this.countdownFor = Math.max(this.countdownFor, 0);
+    // TODO allow the counter to show 1000ms or less (goes down to a single ring)
+    this.countdownFor = Math.max(this.countdownFor, 2000);
   }
 
   onWarningUp(){
