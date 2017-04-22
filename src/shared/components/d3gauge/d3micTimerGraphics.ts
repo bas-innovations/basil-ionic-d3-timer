@@ -7,6 +7,7 @@ import { RingerTimeData } from './d3micTimerConfig.interface';
 
 export class D3micTimerGraphics {
 
+  d3MicTimerEngine: D3micTimerEngine;
   micTimer: any;
   micTimerGroup: any;
   micTimerAttr: any;
@@ -22,7 +23,7 @@ export class D3micTimerGraphics {
   timeData: any;
   warmUpRemaining: number;
 
-  loadDefaultConfig() {
+  private loadDefaultConfig(): void {
 
     let config = {
       // layout/colours configuration
@@ -34,14 +35,18 @@ export class D3micTimerGraphics {
       counterTextSize: 1.5, // The relative height of the text to display in the circle. 1 = 50%
       unitTextSize: 0.6, // The relative height of the text to display in the circle. 1 = 50%
 
-      firstCircleColor: 'rgba' + d3.rgb("lightslategrey").toString().slice(3, - 1) +  ', 0.2)', // lightslategrey
-      readyCircleColor: 'rgba' + d3.rgb("gold").toString().slice(3, - 1) +  ', 0.7)', //gold
-      countdownCircleColor: 'rgba' + d3.rgb("seagreen").toString().slice(3, - 1) +  ', 0.7)', // seagreen
-      warmupCircleColor: "orange", // orange
-      warningCircleColor: 'rgba' + d3.rgb("red").toString().slice(3, - 1) +  ', 0.7)', // red
-      finishedCircleColor: 'rgba' + d3.rgb("outer space").toString().slice(3, - 1) +  ', 0.8)', // outer space
-      textColor: "black",
-      
+      colors: {
+        first: 'rgba' + d3.rgb("lightslategrey").toString().slice(3, - 1) +  ', 0.2)', // lightslategrey
+        ready: 'rgba' + d3.rgb("gold").toString().slice(3, - 1) +  ', 0.7)', //gold
+        countdown: 'rgba' + d3.rgb("seagreen").toString().slice(3, - 1) +  ', 0.7)', // seagreen
+        warmup: "orange", // orange
+        warning: 'rgba' + d3.rgb("red").toString().slice(3, - 1) +  ', 0.7)', // red
+        paused: 'rgba' + d3.rgb("gold").toString().slice(3, - 1) +  ', 0.7)', //gold
+        finished: 'rgba' + d3.rgb("gold").toString().slice(3, - 1) +  ', 0.8)', // outer space
+        stopped: 'rgba' + d3.rgb("outer space").toString().slice(3, - 1) +  ', 0.8)', // outer space
+        text:  'rgba' + d3.rgb("black").toString().slice(3, - 1) +  ', 1.0)', // black
+      },
+
       warmUpFlashTime: 1000, // time to change alpha of warmup band.
       unitsToDisplay: 'SECONDS',
       ringCount: 5, // number of micTimers in the component
@@ -62,8 +67,6 @@ export class D3micTimerGraphics {
     this.config = config;
   }
 
-  d3MicTimerEngine: D3micTimerEngine;
-
   constructor(d3MicTimerEngine: D3micTimerEngine){
     this.loadDefaultConfig();
     this.d3MicTimerEngine = d3MicTimerEngine;
@@ -73,7 +76,7 @@ export class D3micTimerGraphics {
     this.d3MicTimerEngine.pausePingSubject.subscribe( timeData => { this.updateTimeData(); });
   }
 
-  updateTimeData(){
+  private updateTimeData(): void {
     this.timeData = this.d3MicTimerEngine.getTimeData();
     if (!this.isTimerInitialised)
       return;
@@ -81,20 +84,19 @@ export class D3micTimerGraphics {
       this.determineWarmUpAlpha();
       this.determineWarmUpMessage();
     }
-    if (this.isPausedPhase()) {
+    if (this.isPausedPhase())
       this.determinePauseAlpha();
-    }
 
     this.drawD3Timer();
   }
 
-  updatePhase(){
+  private updatePhase(): void{
     this.setPhase(this.d3MicTimerEngine.getPhase());
   }
 
-  updateInit(){
+  private updateInit(): void {
     console.log('in updateInit');
-    this.setRingCount(this.d3MicTimerEngine.getTimeUnitCount());
+    this.setRingCount(this.d3MicTimerEngine.getTimeUnitCount()+1);
     this.initDimensions(); // extracted from end of readyTimer
     this.initD3Timer();
     this.drawD3Timer();    
@@ -128,14 +130,14 @@ export class D3micTimerGraphics {
     this.config.ringCount = ringCount;
   }
 
-  determineWarmUpAlpha(){
+  private determineWarmUpAlpha(): void {
     this.warmUpRemaining = this.d3MicTimerEngine.getWarmUpRemaining();
     let warmUpAlpha = ((this.warmUpRemaining)/this.config.warmUpFlashTime) % 1;
     this.setWarmUpAlpha(warmUpAlpha);
   }
 
   // the warmUp text - gives user plenty of notice timer will start shortly.
-  determineWarmUpMessage(){
+  private determineWarmUpMessage(): void {
     let warmUpMessage: string = '';
     if (this.warmUpRemaining >= 2000) warmUpMessage = '..-' + Math.ceil((this.warmUpRemaining/1000)) + '..';
     if (this.warmUpRemaining < 2000) warmUpMessage = "ready..";
@@ -144,15 +146,15 @@ export class D3micTimerGraphics {
     this.setWarmupMessage(warmUpMessage);
   }
 
-  determinePauseAlpha() {
+  private determinePauseAlpha(): void {
     // over the period of a second, during a pause phase, we want the alpha component of the countdown rings and text to rise from 0 to 1.
     let pauseAlpha = (new Date().getTime()/this.config.warmUpFlashTime) % 1;
     pauseAlpha = (pauseAlpha > 0.5) ? 1 - pauseAlpha : pauseAlpha;
     this.setPauseAlpha(pauseAlpha);
-
   }
 
-  public initDimensions(){
+  // determine overall dimensions of control and its major components
+  public initDimensions(): void {
     console.log('in initDimensions');
     this.applySizeScaleFactor();
 
@@ -170,7 +172,7 @@ export class D3micTimerGraphics {
     this.config.calc.unitTextPixels = (this.config.unitTextSize * this.config.rSize / 2);
   }
 
-  public applySizeScaleFactor(){
+  private applySizeScaleFactor(): void{
     this.config.ringSpacing = this.config.ringSpacing * this.config.scaleFactor;
     this.config.rSize = this.config.rSize * this.config.scaleFactor;
     this.config.rThickness = this.config.rThickness * this.config.scaleFactor;
@@ -269,9 +271,9 @@ export class D3micTimerGraphics {
     let singleDecValueIdx: number = 0;
     for (let td of this.timeData) {
       if (td.t === this.config.unitsToDisplay) {
+        singleDecValueIdx = td.idx;
         break;
       }
-      singleDecValueIdx++;
     };
     return singleDecValueIdx;
   }
@@ -308,7 +310,7 @@ export class D3micTimerGraphics {
         .attr("d", firstCircleArc)
         .attr("filter", "url(#dropshadow)")
         .attr("transform", "translate(" + this.config.calc.radius + "," + this.config.calc.radius + ")" )
-        .style("fill", this.config.firstCircleColor)
+        .style("fill", this.config.colors.first)
       .merge(firstCircle);
 
     firstCircle.exit().remove();
@@ -346,36 +348,43 @@ export class D3micTimerGraphics {
       .merge(secondCircle)
         .style("fill", < any > function(d, i) {
             switch (self.config.calc.phase) {
-              case 'ready': return self.config.readyCircleColor;
+              case 'ready': return self.getCircleColor(self.config.calc.phase);
               case 'warmup': { 
-                  let warmUpColor = d3.rgb(self.config.warmupCircleColor);
+                  let warmUpColor = d3.rgb(self.getCircleColor(self.config.calc.phase));
                   warmUpColor.opacity = self.warmUpScale(self.config.calc.warmUpAlpha);
                   return warmUpColor;
               };
               case 'paused': { 
-                  let pauseColor = d3.rgb(self.config.readyCircleColor);
+                  let pauseColor = d3.rgb(self.getCircleColor(self.config.calc.phase));
                   pauseColor.opacity = self.warmUpScale(self.config.calc.pauseAlpha);
                   return pauseColor;
               };
-              case 'countdown': return self.config.countdownCircleColor;
-              case 'warning': return self.config.warningCircleColor;
-              case 'stopped': return self.config.readyCircleColor;
-              case 'finished': return self.config.readyCircleColor;
+              case 'countdown': return self.getCircleColor(self.config.calc.phase);;
+              case 'warning': return self.getCircleColor(self.config.calc.phase);;
+              case 'stopped': return self.getCircleColor(self.config.calc.phase);;
+              case 'finished': return self.getCircleColor(self.config.calc.phase);;
             }
         })
        .attr("d", secondCircleArc);
 
     secondCircle.exit().remove();
   }
-    
+  
+  getCircleColor(key: string): string {
+    console.log(key);
+    console.log(this.config.colors[key]);
+    return this.config.colors[key];
+  }
   // ** 
   // ** Draw Counter Text
   // **
   drawCounterText(){
-    // console.log('in drawCounterText');
+    console.log('in drawCounterText');
     let self = this;
     let singleDecValueIdx: number = this.getCounterDecValueIdx();
     let textShift = this.config.calc.counterTextPixels * 0.15;
+    console.log(singleDecValueIdx);
+    console.log(JSON.stringify(this.timeData));
 
     let ct = this.micTimerGroup.selectAll(".counterText")
       .data([this.timeData[singleDecValueIdx]]);
@@ -389,15 +398,15 @@ export class D3micTimerGraphics {
       .merge(ct)
         .style("fill", < any > function(d, i) {
           if (self.config.calc.phase === 'warmup') { 
-            let warmupTextColor = d3.rgb(self.config.textColor);
+            let warmupTextColor = d3.rgb(self.config.colors.text);
             warmupTextColor.opacity = self.warmUpScale(self.config.calc.warmUpAlpha);
             return warmupTextColor;
           } else if (self.config.calc.phase === 'paused') { 
-            let pauseColor = d3.rgb(self.config.textColor);
+            let pauseColor = d3.rgb(self.config.colors.text);
             pauseColor.opacity = self.warmUpScale(self.config.calc.pauseAlpha);
             return pauseColor;
           } else {
-            return self.config.textColor;
+            return self.config.colors.text;
           }
         })
         .text(< any > function(d) {
@@ -431,7 +440,7 @@ export class D3micTimerGraphics {
         .attr("class", "timeUnitsText")
         .attr("text-anchor", "middle")
         .attr("font-size", this.config.calc.unitTextPixels + "px")
-        .style("fill", this.config.textColor)
+        .style("fill", this.config.colors.text)
         .attr("transform", "translate(" + this.config.calc.radius + "," + (this.config.calc.radius + this.config.calc.unitTextPixels + shiftTimeUnitsText) + ")" );
 
     timeUnitsText.exit().remove();

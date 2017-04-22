@@ -28,7 +28,7 @@ export class D3micTimerEngine {
 
   initRingerTimeData() {
     this.timeData = [
-      {idx: 0, t: 'MICROSEC', s: 10, max: 100, value: 0, endAngle: 0, baseZeroToOne: 0, singleDecValue: 0},
+      {idx: 0, t: 'MILLISEC', s: 1, max: 1000, value: 0, endAngle: 0, baseZeroToOne: 0, singleDecValue: 0},
       {idx: 1, t: 'SECONDS', s: 1000,  max: 60, value: 0, endAngle: 0, baseZeroToOne: 0, singleDecValue: 0},
       {idx: 2, t: 'MINUTES', s: 60000, max: 60, value: 0, endAngle: 0, baseZeroToOne: 0, singleDecValue: 0},
       {idx: 3, t: 'HOURS', s: 3600000, max: 24, value: 0, endAngle: 0, baseZeroToOne: 0, singleDecValue: 0},
@@ -69,7 +69,7 @@ export class D3micTimerEngine {
   // ** 
   // ** public getters for Observers to pull data
   // **
-  public getTimeData(){
+  public getTimeData(): any {
     return this.timeData;
   }
   
@@ -88,20 +88,20 @@ export class D3micTimerEngine {
   // ** 
   // ** public setter for component
   // **
-  public setWarmUpFor(warmUpFor: number){
+  public setWarmUpFor(warmUpFor: number): void {
     this.warmUpFor = warmUpFor;
   }  
-  public setCountdownFor(countdownFor: number){
+  public setCountdownFor(countdownFor: number): void {
     this.countdownFor = countdownFor;
   }  
-  public setWarningFor(warningFor: number){
+  public setWarningFor(warningFor: number): void {
     this.warningFor = warningFor;
   }  
 
   // **
   // ** Load Timer's Time Settings
   // **
-  loadParentConfig(){
+  private loadParentConfig(): void {
     this.config.warmUpFor = this.warmUpFor;
     this.config.countdownFor = this.countdownFor;
     this.config.warningFor = this.warningFor;
@@ -110,7 +110,15 @@ export class D3micTimerEngine {
   // **
   // ** Timer functions
   // **
-  readyTimer() {
+  
+  // Timer Initialisation
+  public initTimer(): void {
+    console.log('in initTimer');
+    this.readyTimer();
+    this.initChanged();
+  }
+
+  private readyTimer(): void {
     // load configuration data
     this.loadDefaultConfig();
     this.loadParentConfig();
@@ -119,20 +127,15 @@ export class D3micTimerEngine {
     // calculate the time to run the timer
     this.setCountdownToTime();
     // setup the number of time units to process.
-    this.config.timeUnitCount = this.getInitialTimeUnitCount();
-    this.setNumTimeUnits();
+    this.calcInitialTimeUnitCount();
+    this.pruneTimeDataArray();
     
     this.setPhaseByValue('ready');
     let time = this.setTimeRemainingAndPhase();
     this.updateTimeData(time);
   }
 
-  public initTimer(){
-    console.log('in initTimer');
-    this.readyTimer();
-    this.initChanged();
-  }
-
+  // Public Timer Controls
   public startTimer(): void {
     if (this.config.calc.phase !== 'ready')
         return;
@@ -143,13 +146,11 @@ export class D3micTimerEngine {
     this.runTimer();
   }
 
-  runTimer() {
+  private runTimer(): void {
     let self = this;
     this.myD3Timer = d3.interval(function(elapsed) {
       // check if time is up or if it has been stopped by the user.
-      if ((self.config.calc.phase === 'finished') || (self.config.calc.phase === 'stopped')) {
-        if (self.config.calc.phase === 'finished') console.log('timer has finished');
-        if (self.config.calc.phase === 'stopped') console.log('timer has been stopped');
+      if (self.isTimerFinishedOrStopped()) {
         self.myD3Timer.stop();
         self.update();
         self.resetTimer();
@@ -159,35 +160,40 @@ export class D3micTimerEngine {
     }, this.config.updateInterval)
   }
 
-  public pauseTimer(){
+  public pauseTimer(): void {
     this.config.calc.previousPhase = this.config.calc.phase;
     this.myD3Timer.stop();
     this.setPhaseByValue('paused');
     this.runTimer();
   }
 
-  public unPauseTimer() {
+  public unPauseTimer(): void {
     this.myD3Timer.stop();
     this.setPhaseByValue(this.config.calc.previousPhase);
     this.countdownToTime = new Date().getTime() + this.countdownRemaining;
     this.runTimer();
   }
 
-  public stopTimer() {
+  public stopTimer(): void  {
     this.myD3Timer.stop();
     this.setPhaseByValue('stopped');
     this.runTimer();
   }
 
-  resetTimer(){
+  private resetTimer(): void {
     this.readyTimer();
     this.finishedChanged();
   };
 
-  setCountdownToTime(){
+
+  private setCountdownToTime(): void {
     let currentTime = new Date().getTime()
     this.countdownToTime = currentTime + this.config.countdownFor + this.config.warmUpFor;
-    console.log('setCountdownToTime=>currentTime: ' + currentTime);
+    this.countdownTimeDebugDisplay();
+  }
+
+  // purely for debug
+  private countdownTimeDebugDisplay(): void{
     console.log('setCountdownToTime=>this.config.countdownFor: ' + this.config.countdownFor);
     console.log('setCountdownToTime=>this.config.warmUpFor: ' + this.config.warmUpFor);
     console.log('setCountdownToTime=>this.countdownToTime: ' + this.countdownToTime);
@@ -197,7 +203,7 @@ export class D3micTimerEngine {
   // ** update is called by the main timer interval, it simply calls the methods required to
   // ** update the time information and redraw the timer components d3 objects.
   // **
-  update(): any {
+  private update(): void {
     let time = this.setTimeRemainingAndPhase();
     
     if (!this.isTimerPaused())
@@ -207,7 +213,8 @@ export class D3micTimerEngine {
     }
   }
 
-  setTimeRemainingAndPhase(): number {
+  // TODO refactor this function
+  private setTimeRemainingAndPhase(): number {
     let time: number = 0;
 
     // store the new time remaining and exit
@@ -234,7 +241,6 @@ export class D3micTimerEngine {
         break;
       case 'finished':
       case 'stopped':
-        time = 0;
         this.countdownRemaining = 0;
         break;
       default :
@@ -244,7 +250,7 @@ export class D3micTimerEngine {
     return time;
   }
 
-  updateTimeData(time: number){
+  private updateTimeData(time: number): void {
     let timeInMS = time;
 
     for (let i=this.timeData.length-1; i>=0; i--) {
@@ -258,7 +264,7 @@ export class D3micTimerEngine {
       td.endAngle = degrees * (Math.PI / 180);
       td.baseZeroToOne = (td.value / td.max);
 
-      if (this.config.calc.phase === 'finished' || this.config.calc.phase === 'stopped') {
+      if (this.isTimerFinishedOrStopped()) {
         degrees = 0; //360;
         td.endAngle = 0; // 2 * Math.PI;
         td.singleDecValue = 0;
@@ -269,43 +275,42 @@ export class D3micTimerEngine {
   }
 
   // Notify Observers of change
-  timeDataChanged(){
+  private timeDataChanged(): void {
     if (this.timeDataSubject !== undefined)
       this.timeDataSubject.next(true);
   }
 
-  pausePing(){
+  private pausePing(): void {
     if (this.pausePingSubject !== undefined)
       this.pausePingSubject.next(true);
   }
 
-  phaseChanged(){
+  private phaseChanged(): void {
     if (this.phaseSubject !== undefined)
       this.phaseSubject.next(true);
   }
 
-  initChanged(){
+  private initChanged(): void {
     if (this.initSubject !== undefined)
       this.initSubject.next(true);
   }
 
-  finishedChanged(){
+  private finishedChanged(): void {
     if (this.finishedSubject !== undefined)
       this.finishedSubject.next(true);
   }
 
   // Pull a phase change into the queue
-  setPhaseByValue(phase){
+  private setPhaseByValue(phase): void {
     let t = d3.timer(() => {
       this.config.calc.phase = phase;
       this.phaseChanged();
-      //console.log('phase set by value to :' + phase);
       t.stop();
     }, 0);
   };
 
   // Set the phase based on the timer's time.
-  setPhase(timeRemaining){
+  private setPhase(timeRemaining): void {
     // this should only be calls when the timer is actively running (i.e. phase warmup, countdown and warning)
     // console.log(timeRemaining);
     if (this.config.calc.phase === 'warmup' || this.config.calc.phase === 'countdown' || this.config.calc.phase === 'warning') {
@@ -325,31 +330,38 @@ export class D3micTimerEngine {
     }
   }
 
-  isTimerPaused(): boolean {
+  private isTimerPaused(): boolean {
     return (this.config.calc.phase === 'paused');
+  }
+
+  private isTimerFinishedOrStopped(): boolean {
+    return (this.config.calc.phase === 'finished' || this.config.calc.phase === 'stopped');
   }
 
   // **
   // ** Determine number of Time Units to be processed
   // **
-  getInitialTimeUnitCount(): number{
+  private calcInitialTimeUnitCount(): void {
     let time: number = Math.abs(this.countdownToTime - (new Date().getTime()) - +this.config.warmUpFor);
     console.log('in getInitialRingNums=>this.countdownToTime: ' + this.countdownToTime);
     console.log('in getInitialRingNums=>time: ' + time);
     console.log('in getInitialRingNums=>getTime: ' + new Date().getTime());
+    console.log('in getInitialRingNums=>this.timeData.length: ' + this.timeData.length);
     for (let timeUnitCount=this.timeData.length-1; timeUnitCount>=0; timeUnitCount--) {
       let td = this.timeData[timeUnitCount];
-      if (time > td.s) return (timeUnitCount + 1);
+      if (time > td.s) 
+        this.config.timeUnitCount = (timeUnitCount + 1);
     }
-    return 1;
+    //this.config.timeUnitCount = 1;
+    console.log('in getInitialRingNums=>this.config.timeUnitCount: ' + this.config.timeUnitCount);
   }
 
-  setNumTimeUnits() {
+  private pruneTimeDataArray(): void {
     // remove unneeded rows from the timeData array.
     let arrSize = this.timeData.length;
-    for (let i=arrSize-1; i>=this.config.timeUnitCount; i--) {
+    for (let i=arrSize-1; i>this.config.timeUnitCount; i--) {
+      console.log('popping');
       this.timeData.pop();
     }
   }
-
 }
