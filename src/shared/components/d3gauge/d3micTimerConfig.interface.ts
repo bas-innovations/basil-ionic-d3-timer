@@ -10,7 +10,6 @@ export interface RingerTimeData {
   s: number;
   max: number;
   value: number;
-  endAngle: number;
   baseZeroToOne: number;
   singleDecValue: number;
 }

@@ -68,11 +68,9 @@ export class D3micTimerGraphics {
           // variable set via public setters
           phase: 'ready', // 'warmup', 'countdown', 'warning', 'finished', 'paused', 'stopped'
           warmUpMessage: 'ready...',
-          pauseAlpha: 1.0, // variable to enable pulsing effect during a pause phase.
-          warmUpAlpha: 1.0, // variable to enable pulsing effect during the warm up phase.
           alphas: {
-            paused: 0.3,
-            warmup: 0.3,
+            paused: 0.3, // variable to enable pulsing effect during a pause phase.
+            warmup: 0.3, // variable to enable pulsing effect during the warm up phase.
           }          
       } 
     };
@@ -90,7 +88,6 @@ export class D3micTimerGraphics {
     if (this.isPausedPhase())
       this.determinePauseAlpha();
 
-    console.log('in updateTimeData=>phase: ' + this.config.calc.phase);
     this.drawD3Timer();
   }
 
@@ -110,7 +107,6 @@ export class D3micTimerGraphics {
   }
 
   private setWarmUpAlpha(alpha): void {
-    //this.config.calc.warmUpAlpha = warmUpAlpha;
     this.config.calc.alphas["warmup"] = alpha;
   }
 
@@ -120,8 +116,6 @@ export class D3micTimerGraphics {
 
   private setPhase(phase: string): void {
     this.config.calc.phase = phase;
-    // console.log(phase);
-    // this.drawD3Timer();
   }
 
   private isWarmUpPhase(): boolean {
@@ -316,7 +310,6 @@ export class D3micTimerGraphics {
        .attr("d", this.circleArcFunction("secondCircle"));
 
     secondCircle.exit().remove();
-    console.log("in drawSecondCircle=>phase: " + self.config.calc.phase);
   }
 
   // ** 
@@ -438,5 +431,4 @@ export class D3micTimerGraphics {
       return retVal;
     }
   }
-
 }

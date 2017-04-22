@@ -1,10 +1,8 @@
 import { Subject } from 'rxjs/Subject';
 
-import * as d3 from 'd3';
-import * as moment from 'moment';
-import mergeDeep from '../../merge'
+import * as d3 from 'd3'; // for the interval function
 
-import { IMicTimerConfig, RingerTimeData } from './d3micTimerConfig.interface';
+import { RingerTimeData } from './d3micTimerConfig.interface';
 
 export class D3micTimerEngine {
 
@@ -28,11 +26,11 @@ export class D3micTimerEngine {
 
   initRingerTimeData() {
     this.timeData = [
-      {idx: 0, t: 'MILLISEC', s: 1, max: 1000, value: 0, endAngle: 0, baseZeroToOne: 0, singleDecValue: 0},
-      {idx: 1, t: 'SECONDS', s: 1000,  max: 60, value: 0, endAngle: 0, baseZeroToOne: 0, singleDecValue: 0},
-      {idx: 2, t: 'MINUTES', s: 60000, max: 60, value: 0, endAngle: 0, baseZeroToOne: 0, singleDecValue: 0},
-      {idx: 3, t: 'HOURS', s: 3600000, max: 24, value: 0, endAngle: 0, baseZeroToOne: 0, singleDecValue: 0},
-      {idx: 4, t: 'DAYS', s: 86400000, max: 365, value: 0, endAngle: 0, baseZeroToOne: 0, singleDecValue: 0}
+      {idx: 0, t: 'MILLISEC', s: 1, max: 1000, value: 0, baseZeroToOne: 0, singleDecValue: 0},
+      {idx: 1, t: 'SECONDS', s: 1000,  max: 60, value: 0, baseZeroToOne: 0, singleDecValue: 0},
+      {idx: 2, t: 'MINUTES', s: 60000, max: 60, value: 0, baseZeroToOne: 0, singleDecValue: 0},
+      {idx: 3, t: 'HOURS', s: 3600000, max: 24, value: 0, baseZeroToOne: 0, singleDecValue: 0},
+      {idx: 4, t: 'DAYS', s: 86400000, max: 365, value: 0, baseZeroToOne: 0, singleDecValue: 0}
     ]
   }
 
@@ -189,14 +187,6 @@ export class D3micTimerEngine {
   private setCountdownToTime(): void {
     let currentTime = new Date().getTime()
     this.countdownToTime = currentTime + this.config.countdownFor + this.config.warmUpFor;
-    this.countdownTimeDebugDisplay();
-  }
-
-  // purely for debug
-  private countdownTimeDebugDisplay(): void{
-    console.log('setCountdownToTime=>this.config.countdownFor: ' + this.config.countdownFor);
-    console.log('setCountdownToTime=>this.config.warmUpFor: ' + this.config.warmUpFor);
-    console.log('setCountdownToTime=>this.countdownToTime: ' + this.countdownToTime);
   }
 
   // **
@@ -259,14 +249,9 @@ export class D3micTimerEngine {
       td.singleDecValue = timeInMS  / td.s;
       time -= Math.floor(value) * td.s;
       td.value = Math.floor(value);
-      // calculate arc end angle
-      let degrees = Math.max(0, 360 - (td.value / td.max) * 360.0);  // prevent the degrees going negative with slight timer overrun.
-      td.endAngle = degrees * (Math.PI / 180);
       td.baseZeroToOne = (td.value / td.max);
 
       if (this.isTimerFinishedOrStopped()) {
-        degrees = 0; //360;
-        td.endAngle = 0; // 2 * Math.PI;
         td.singleDecValue = 0;
         td.baseZeroToOne = 0;
       }
@@ -312,7 +297,6 @@ export class D3micTimerEngine {
   // Set the phase based on the timer's time.
   private setPhase(timeRemaining): void {
     // this should only be calls when the timer is actively running (i.e. phase warmup, countdown and warning)
-    // console.log(timeRemaining);
     if (this.config.calc.phase === 'warmup' || this.config.calc.phase === 'countdown' || this.config.calc.phase === 'warning') {
       if (timeRemaining > this.config.countdownFor) {
         this.setPhaseByValue('warmup');
@@ -343,24 +327,22 @@ export class D3micTimerEngine {
   // **
   private calcInitialTimeUnitCount(): void {
     let time: number = Math.abs(this.countdownToTime - (new Date().getTime()) - +this.config.warmUpFor);
-    console.log('in getInitialRingNums=>this.countdownToTime: ' + this.countdownToTime);
-    console.log('in getInitialRingNums=>time: ' + time);
-    console.log('in getInitialRingNums=>getTime: ' + new Date().getTime());
-    console.log('in getInitialRingNums=>this.timeData.length: ' + this.timeData.length);
+    console.log('in calcInitialTimeUnitCount=>this.countdownToTime: ' + this.countdownToTime);
+    console.log('in calcInitialTimeUnitCount=>time: ' + time);
+    console.log('in calcInitialTimeUnitCount=>getTime: ' + new Date().getTime());
+    console.log('in calcInitialTimeUnitCount=>this.timeData.length: ' + this.timeData.length);
     for (let timeUnitCount=this.timeData.length-1; timeUnitCount>=0; timeUnitCount--) {
       let td = this.timeData[timeUnitCount];
       if (time > td.s) 
         this.config.timeUnitCount = (timeUnitCount + 1);
     }
-    //this.config.timeUnitCount = 1;
-    console.log('in getInitialRingNums=>this.config.timeUnitCount: ' + this.config.timeUnitCount);
+    console.log('in calcInitialTimeUnitCount=>this.config.timeUnitCount: ' + this.config.timeUnitCount);
   }
 
   private pruneTimeDataArray(): void {
     // remove unneeded rows from the timeData array.
     let arrSize = this.timeData.length;
     for (let i=arrSize-1; i>this.config.timeUnitCount; i--) {
-      console.log('popping');
       this.timeData.pop();
     }
   }
