@@ -213,7 +213,7 @@ export class D3micTimerEngine {
     }
   }
 
-  // TODO refactor this function
+  // TODO refactor this long multi-purpose function
   private setTimeRemainingAndPhase(): number {
     let time: number = 0;
 
