@@ -1,9 +1,6 @@
-import { Component } from '@angular/core';
-
 import * as d3 from 'd3';
 
 import { D3micTimerEngine } from './d3micTimerEngine';
-import { RingerTimeData } from './d3micTimerConfig.interface';
 
 export class D3micTimerGraphics {
 
@@ -104,10 +101,6 @@ export class D3micTimerGraphics {
 
   private setColorAlpha(colorKey: string, alpha: number){
     this.config.calc.alphas[colorKey] = alpha;
-  }
-
-  private setWarmUpAlpha(alpha): void {
-    this.config.calc.alphas["warmup"] = alpha;
   }
 
   private setWarmupMessage(warmUpMessage): void {
@@ -273,7 +266,6 @@ export class D3micTimerGraphics {
   // ** Draw the base circles (first circles).
   // **
   private drawFirstCircle(): void {
-    let self = this;
 
     let firstCircle = this.micTimerGroup.selectAll(".firstCircle")
         .data(this.timeData, < any > function(d, i) { return d.idx; });

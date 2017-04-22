@@ -2,8 +2,6 @@ import { Component } from '@angular/core';
 
 import { NavController } from 'ionic-angular';
 
-import { IMicTimerConfig } from '../../shared/components/d3gauge/d3micTimerConfig.interface';
-
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
