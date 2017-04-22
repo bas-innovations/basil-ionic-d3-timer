@@ -2,7 +2,7 @@ import { Subject } from 'rxjs/Subject';
 
 import * as d3 from 'd3'; // for the interval function
 
-import { RingerTimeData } from './d3micTimerConfig.interface';
+import { TimerTimeData } from './d3micTimerConfig.interface';
 
 export class D3micTimerEngine {
 
@@ -22,7 +22,7 @@ export class D3micTimerEngine {
   private myD3Timer: any;
   private config: any;
 
-  protected timeData: RingerTimeData[];
+  protected timeData: TimerTimeData[];
 
   initRingerTimeData() {
     this.timeData = [
