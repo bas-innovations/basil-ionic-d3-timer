@@ -1,7 +1,7 @@
 # basil-ionic-d3-timer
 A demonstration of using a custom component in ionic.
 
-![alt text](https://github.com/bas-innovations/basil-ionic-d3-timer/raw/master/src/assets/markdown-here/d3-timer-screenshot-countdown.png "Timer screenshot in countdown phase")
+![alt text](https://github.com/bas-innovations/basil-ionic-d3-timer/raw/master/src/assets/markdown-here/d3-timer-screen.gif "Timer screen recording")
 
 This demonstration has a number of features
 
