@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, OnChanges, SimpleChange, OnDestroy, Input, Output} from '@angular/core';
+import { Component, EventEmitter, OnChanges, SimpleChange, Input, Output} from '@angular/core';
 
 import { D3micTimerEngine } from './d3micTimerEngine';
 import { D3micTimerGraphics } from './d3micTimerGraphics';

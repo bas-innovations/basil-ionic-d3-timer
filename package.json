@@ -1,5 +1,6 @@
 {
-  "name": "ionic-hello-world",
+  "name": "ionic-mic-timer",
+  "version": "0.1.0",
   "author": "Ionic Framework",
   "homepage": "http://ionicframework.com/",
   "private": true,

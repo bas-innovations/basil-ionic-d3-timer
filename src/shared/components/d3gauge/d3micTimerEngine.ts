@@ -25,12 +25,24 @@ export class D3micTimerEngine {
   protected timeData: TimerTimeData[];
 
   initRingerTimeData() {
+
+    const MILLISECS_IN_MILLISEC: number = 1;
+    const MILLISECS_IN_SECOND: number = 1000;
+    const MILLISECS_IN_MINUTE: number = 60000;
+    const MILLISECS_IN_HOUR: number = 3600000;
+    const MILLISECS_IN_DAY: number = 86400000;
+
+    const SECONDS_IN_MINUTE: number = 60;
+    const MINUTES_IN_HOUR: number = 60;
+    const HOURS_IN_DAY: number = 24;
+    const DAYS_IN_YEAR: number = 365;
+
     this.timeData = [
-      {idx: 0, t: 'MILLISEC', s: 1, max: 1000, value: 0, baseZeroToOne: 0, singleDecValue: 0},
-      {idx: 1, t: 'SECONDS', s: 1000,  max: 60, value: 0, baseZeroToOne: 0, singleDecValue: 0},
-      {idx: 2, t: 'MINUTES', s: 60000, max: 60, value: 0, baseZeroToOne: 0, singleDecValue: 0},
-      {idx: 3, t: 'HOURS', s: 3600000, max: 24, value: 0, baseZeroToOne: 0, singleDecValue: 0},
-      {idx: 4, t: 'DAYS', s: 86400000, max: 365, value: 0, baseZeroToOne: 0, singleDecValue: 0}
+      {idx: 0, t: 'MILLISEC', s: MILLISECS_IN_MILLISEC, max: MILLISECS_IN_SECOND, value: 0, baseZeroToOne: 0, singleDecValue: 0},
+      {idx: 1, t: 'SECONDS', s: MILLISECS_IN_SECOND,  max: SECONDS_IN_MINUTE, value: 0, baseZeroToOne: 0, singleDecValue: 0},
+      {idx: 2, t: 'MINUTES', s: MILLISECS_IN_MINUTE, max: MINUTES_IN_HOUR, value: 0, baseZeroToOne: 0, singleDecValue: 0},
+      {idx: 3, t: 'HOURS', s: MILLISECS_IN_HOUR, max: HOURS_IN_DAY, value: 0, baseZeroToOne: 0, singleDecValue: 0},
+      {idx: 4, t: 'DAYS', s: MILLISECS_IN_DAY, max: DAYS_IN_YEAR, value: 0, baseZeroToOne: 0, singleDecValue: 0}
     ]
   }
 
@@ -198,12 +210,12 @@ export class D3micTimerEngine {
     
     if (!this.isTimerPaused())
       this.updateTimeData(time);
-    else {
+    else 
       this.pausePing();
-    }
   }
 
   // TODO refactor this long multi-purpose function
+  // TODO remove switch statement, may move to polymorphic or delegation solution.
   private setTimeRemainingAndPhase(): number {
     let time: number = 0;
 
@@ -295,6 +307,7 @@ export class D3micTimerEngine {
   };
 
   // Set the phase based on the timer's time.
+  // TODO remove switch statement, may move to polymorphic or delegation solution.
   private setPhase(timeRemaining): void {
     // this should only be calls when the timer is actively running (i.e. phase warmup, countdown and warning)
     if (this.config.calc.phase === 'warmup' || this.config.calc.phase === 'countdown' || this.config.calc.phase === 'warning') {
