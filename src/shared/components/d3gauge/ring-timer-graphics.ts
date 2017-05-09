@@ -1,10 +1,10 @@
 import * as d3 from 'd3';
 
-import { D3micTimerEngine } from './d3micTimerEngine';
+import { RingTimerEngine } from './ring-timer-engine';
 
-export class D3micTimerGraphics {
+export class RingTimerGraphics {
 
-  d3MicTimerEngine: D3micTimerEngine;
+  ringTimerEngine: RingTimerEngine;
   micTimer: any;
   micTimerGroup: any;
   micTimerDimAttr: any;
@@ -20,13 +20,13 @@ export class D3micTimerGraphics {
   timeData: any;
   warmUpRemaining: number;
 
-  constructor(d3MicTimerEngine: D3micTimerEngine){
+  constructor(ringTimerEngine: RingTimerEngine){
     this.loadDefaultConfig();
-    this.d3MicTimerEngine = d3MicTimerEngine;
-    this.d3MicTimerEngine.timeDataSubject.subscribe( timeData => { this.updateTimeData(); });     
-    this.d3MicTimerEngine.phaseSubject.subscribe( timeData => { this.updatePhase(); });
-    this.d3MicTimerEngine.initSubject.subscribe( timeData => { this.updateInit(); });
-    this.d3MicTimerEngine.pausePingSubject.subscribe( timeData => { this.updateTimeData(); });
+    this.ringTimerEngine = ringTimerEngine;
+    this.ringTimerEngine.timeDataSubject.subscribe( timeData => { this.updateTimeData(); });     
+    this.ringTimerEngine.phaseSubject.subscribe( timeData => { this.updatePhase(); });
+    this.ringTimerEngine.initSubject.subscribe( timeData => { this.updateInit(); });
+    this.ringTimerEngine.pausePingSubject.subscribe( timeData => { this.updateTimeData(); });
   }
 
   private loadDefaultConfig(): void {
@@ -56,7 +56,7 @@ export class D3micTimerGraphics {
       warmUpFlashTime: 1000, // time to change alpha of warmup band.
       unitsToDisplay: 'SECONDS',
       ringCount: 5, // number of micTimers in the component
-      elementId: 'micTimer-gauge',
+      elementId: 'ring-timer-gauge',
 
       calc: { // these variables are placed here as the config structure is a convenient place to store, pass them. But not actually configuration variables.
           radius: 0,
@@ -75,7 +75,7 @@ export class D3micTimerGraphics {
   }
 
   private updateTimeData(): void {
-    this.timeData = this.d3MicTimerEngine.getTimeData();
+    this.timeData = this.ringTimerEngine.getTimeData();
     if (!this.isTimerInitialised)
       return;
     if (this.isWarmUpPhase()) {
@@ -89,11 +89,11 @@ export class D3micTimerGraphics {
   }
 
   private updatePhase(): void {
-    this.setPhase(this.d3MicTimerEngine.getPhase());
+    this.setPhase(this.ringTimerEngine.getPhase());
   }
 
   private updateInit(): void {
-    this.setRingCount(this.d3MicTimerEngine.getTimeUnitCount()+1);
+    this.setRingCount(this.ringTimerEngine.getTimeUnitCount()+1);
     this.initDimensions(); // extracted from end of readyTimer
     this.initD3Timer();
     this.drawD3Timer();    
@@ -124,7 +124,7 @@ export class D3micTimerGraphics {
   }
 
   private determineWarmUpAlpha(): void {
-    this.warmUpRemaining = this.d3MicTimerEngine.getWarmUpRemaining();
+    this.warmUpRemaining = this.ringTimerEngine.getWarmUpRemaining();
     let alpha = ((this.warmUpRemaining)/this.config.warmUpFlashTime) % 1;
     this.setColorAlpha("warmup", alpha);
   }

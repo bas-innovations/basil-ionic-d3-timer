@@ -1,14 +1,13 @@
 import { Component, EventEmitter, OnChanges, SimpleChange, Input, Output} from '@angular/core';
 
-import { D3micTimerEngine } from './d3micTimerEngine';
-import { D3micTimerGraphics } from './d3micTimerGraphics';
-
+import { RingTimerEngine } from './ring-timer-engine';
+import { RingTimerGraphics } from './ring-timer-graphics';
 
 @Component({
-    selector: 'd3-micTimer',
-    templateUrl: 'd3micTimer.component.html'
+    selector: 'ring-timer',
+    templateUrl: 'ring-timer.component.html'
 })
-export class D3MicTimerComponent implements OnChanges {
+export class RingTimerComponent implements OnChanges {
   @Input() timerAction: any;
   @Input() warmUpFor: any;
   @Input() countdownFor: any;
@@ -18,13 +17,13 @@ export class D3MicTimerComponent implements OnChanges {
 
   changeLog: string[] = [];
   config: any;
-  d3micTimerEngine: D3micTimerEngine;
-  d3micTimerGraphics: D3micTimerGraphics;
+  ringTimerEngine: RingTimerEngine;
+  ringTimerGraphics: RingTimerGraphics;
 
   constructor() {
-    this.d3micTimerEngine = new D3micTimerEngine();
-    this.d3micTimerGraphics = new D3micTimerGraphics(this.d3micTimerEngine);
-    this.d3micTimerEngine.finishedSubject.subscribe( data => { this.onTimerFinished(); }); 
+    this.ringTimerEngine = new RingTimerEngine();
+    this.ringTimerGraphics = new RingTimerGraphics(this.ringTimerEngine);
+    this.ringTimerEngine.finishedSubject.subscribe( data => { this.onTimerFinished(); }); 
     this.loadDefaultConfig();
   }
   
@@ -39,7 +38,7 @@ export class D3MicTimerComponent implements OnChanges {
 
   ngAfterViewInit(){
     this.loadParentConfig();
-    this.d3micTimerEngine.initTimer();
+    this.ringTimerEngine.initTimer();
   };
 
   // **
@@ -74,7 +73,7 @@ export class D3MicTimerComponent implements OnChanges {
         this.config[propName] = parseInt(propValue);
         if (!isFirstChange){
           this.loadParentConfig();
-          this.d3micTimerEngine.initTimer();
+          this.ringTimerEngine.initTimer();
         }
         break;
     }
@@ -84,16 +83,16 @@ export class D3MicTimerComponent implements OnChanges {
     console.log('in handleTimerAction');
     switch (this.timerAction) {
       case ("start"):
-        this.d3micTimerEngine.startTimer();
+        this.ringTimerEngine.startTimer();
         break;
       case ("pause"):
-        this.d3micTimerEngine.pauseTimer();
+        this.ringTimerEngine.pauseTimer();
         break;
       case ("unPause"):
-        this.d3micTimerEngine.unPauseTimer();
+        this.ringTimerEngine.unPauseTimer();
         break;
       case ("stop"):
-        this.d3micTimerEngine.stopTimer();
+        this.ringTimerEngine.stopTimer();
         break;
       case ("stopped"):
         // do nothing - just a bounce back from notifying the parent that timer has finished.
@@ -120,9 +119,9 @@ export class D3MicTimerComponent implements OnChanges {
     this.config.countdownFor = parseInt(this.countdownFor);
     this.config.warningFor = parseInt(this.warningFor);
 
-    this.d3micTimerEngine.setWarmUpFor(parseInt(this.warmUpFor));
-    this.d3micTimerEngine.setCountdownFor(parseInt(this.countdownFor));
-    this.d3micTimerEngine.setWarningFor(parseInt(this.warningFor));
+    this.ringTimerEngine.setWarmUpFor(parseInt(this.warmUpFor));
+    this.ringTimerEngine.setCountdownFor(parseInt(this.countdownFor));
+    this.ringTimerEngine.setWarningFor(parseInt(this.warningFor));
   }
 }
 

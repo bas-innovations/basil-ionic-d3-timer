@@ -2,9 +2,9 @@ import { Subject } from 'rxjs/Subject';
 
 import * as d3 from 'd3'; // for the interval function
 
-import { TimerTimeData } from './d3micTimerConfig.interface';
+import { TimerTimeData } from './ring-timer-config.interface';
 
-export class D3micTimerEngine {
+export class RingTimerEngine {
 
   public timeDataSubject: Subject<any>;
   public phaseSubject: Subject<any>;
@@ -322,7 +322,7 @@ export class D3micTimerEngine {
         this.setPhaseByValue('finished');
       } else {
         // typically would throw error here rather than console.log
-        console.log('Error in d3micTimer.component.ts=>setPhase')
+        console.log('Error in ring-timer.component.ts=>setPhase')
       }
     }
   }

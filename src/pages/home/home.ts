@@ -9,7 +9,7 @@ import { NavController } from 'ionic-angular';
 export class HomePage {
 
   // variables for micTimer component
-  micTimerAction: string;
+  ringTimerAction: string;
   micStatus: string;
 
   warmUpFor: number = 5000;
@@ -43,7 +43,7 @@ export class HomePage {
   // ** actions on micTimer component
   // **
   onStartMicTimer(){
-    this.micTimerAction = "start";
+    this.ringTimerAction = "start";
     this.micStatus = 'recording';
     this.startMicTimerBtnDisabled = true;
     this.pauseMicTimerBtnDisabled = false;
@@ -53,16 +53,16 @@ export class HomePage {
 
   onPauseMicTimer(){
     if (this.micStatus !== "paused") {
-      this.micTimerAction = "pause";
+      this.ringTimerAction = "pause";
       this.micStatus = 'paused';
     } else {
-      this.micTimerAction = "unPause";
+      this.ringTimerAction = "unPause";
       this.micStatus = 'recording';
     }
   }
 
   onStopMicTimer(){
-    this.micTimerAction = "stop";
+    this.ringTimerAction = "stop";
     this.micStatus = 'stopped';
 
     this.startMicTimerBtnDisabled = false;
@@ -73,7 +73,7 @@ export class HomePage {
 
   onFinished() {
     console.log('in home.ts=>onFinished');
-    this.micTimerAction = "stopped";
+    this.ringTimerAction = "stopped";
     this.micStatus = 'stopped';
     this.startMicTimerBtnDisabled = false;
     this.pauseMicTimerBtnDisabled = true;

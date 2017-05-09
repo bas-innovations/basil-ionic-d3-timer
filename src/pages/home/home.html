@@ -13,11 +13,11 @@
     </ion-row>
     <ion-row>
       <ion-col col-12 class="svg-column" >
-        <d3-micTimer id="micTimer-gauge1" timerAction={{micTimerAction}} 
+        <ring-timer id="ring-timer-gauge1" timerAction={{ringTimerAction}} 
                     warmUpFor={{warmUpFor}}
                     countdownFor={{countdownFor}} 
                     warningFor={{warningFor}} 
-                    (finished)="onFinished($event)"></d3-micTimer>
+                    (finished)="onFinished($event)"></ring-timer>
       </ion-col>
     </ion-row>
 

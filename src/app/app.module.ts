@@ -9,7 +9,7 @@ import { TabsPage } from '../pages/tabs/tabs';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
-import { D3MicTimerComponent } from '../shared/components/d3gauge/d3micTimer.component';
+import { RingTimerComponent } from '../shared/components/d3gauge/ring-timer.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +18,7 @@ import { D3MicTimerComponent } from '../shared/components/d3gauge/d3micTimer.com
     ContactPage,
     HomePage,
     TabsPage,
-    D3MicTimerComponent
+    RingTimerComponent
   ],
   imports: [
     IonicModule.forRoot(MyApp)
